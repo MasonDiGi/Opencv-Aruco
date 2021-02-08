@@ -7,18 +7,19 @@ import sys
 from consts import ARUCO_DICT
 import configparser
 import numpy as np
-from cameracal import cal
+import cameracal
 
 config = configparser.ConfigParser()
 config.read("camera.ini")
 
-mtx, dist, rvecs, tvecs = cal()
 # construct the argument parser and parse the arguments
 ap = argparse.ArgumentParser()
 ap.add_argument("-t", "--type", type=str,
                 default="DICT_ARUCO_ORIGINAL",
                 help="type of ArUCo tag to detect")
 args = vars(ap.parse_args())
+
+mtx, dist, rvecs, tvecs = cameracal.cal()
 
 # verify that the supplied ArUCo tag exists and is supported by OpenCV
 if ARUCO_DICT.get(args["type"], None) is None:
@@ -31,7 +32,7 @@ arucoDict = cv2.aruco.Dictionary_get(ARUCO_DICT[args["type"]])
 arucoParams = cv2.aruco.DetectorParameters_create()
 # initialize the video stream and allow the camera sensor to warm up
 print("[INFO] starting video stream...")
-vs = VideoStream(src=1).start()
+vs = VideoStream(src=0).start()
 time.sleep(2.0)
 
 # loop over the frames from the video stream
