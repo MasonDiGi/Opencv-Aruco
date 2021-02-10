@@ -9,11 +9,6 @@ import configparser
 import numpy as np
 from cameracal import cal
 
-config = configparser.ConfigParser()
-config.read("camera.ini")
-
-camCal = cal()
-
 # construct the argument parser and parse the arguments
 ap = argparse.ArgumentParser()
 ap.add_argument("-t", "--type", type=str,
@@ -21,11 +16,16 @@ ap.add_argument("-t", "--type", type=str,
                 help="type of ArUCo tag to detect")
 args = vars(ap.parse_args())
 
+
+camCal = cal()
+
+
 # verify that the supplied ArUCo tag exists and is supported by OpenCV
 if ARUCO_DICT.get(args["type"], None) is None:
     print("[INFO] ArUCo tag of '{}' is not supported".format(
         args["type"]))
     sys.exit(0)
+
 # load the ArUCo dictionary and grab the ArUCo parameters
 print(f"[INFO] detecting '{args['type']}' tags...")
 arucoDict = cv2.aruco.Dictionary_get(ARUCO_DICT[args["type"]])
