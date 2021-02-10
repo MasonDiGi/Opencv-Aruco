@@ -24,3 +24,12 @@ ARUCO_DICT = {
     "DICT_APRILTAG_36h10": cv2.aruco.DICT_APRILTAG_36h10,
     "DICT_APRILTAG_36h11": cv2.aruco.DICT_APRILTAG_36h11
 }
+
+
+# (x, z, theta, field id)
+MARKER_LOCATIONS = {
+    1: (0, 0, 0, "B1"),
+    2: (0, 0, 0, "D1"),
+    3: (0, 0, 0, "B11"),
+    4: (0, 0, 0, "D11")
+}
