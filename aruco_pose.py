@@ -19,7 +19,7 @@ ap.add_argument("-t", "--type", type=str,
                 help="type of ArUCo tag to detect")
 args = vars(ap.parse_args())
 
-mtx, dist, rvecs, tvecs = cameracal.cal()
+mtx, dist, rvecs, tvecs, _ = cameracal.cal()
 
 # verify that the supplied ArUCo tag exists and is supported by OpenCV
 if ARUCO_DICT.get(args["type"], None) is None:
@@ -48,11 +48,11 @@ while True:
     if len(corners) > 0:
         cv2.aruco.drawDetectedMarkers(frame, corners, ids)
         rvecs, tvecs, _ = cv2.aruco.estimatePoseSingleMarkers(
-            corners, 0.05, mtx, dist, np.float32(rvecs), np.float32(tvecs))
+            corners, 0.079, mtx, dist, np.float32(rvecs), np.float32(tvecs))
         for i in ids:
             i = np.where(ids == i)
             cv2.aruco.drawAxis(frame, mtx,
-                               dist, rvecs[i], tvecs[i], 0.02)
+                               dist, rvecs[i], tvecs[i], 0.035)
         print(tvecs[0])
 
         # show the output frame

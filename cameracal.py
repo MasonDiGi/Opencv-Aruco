@@ -1,27 +1,33 @@
+import cv2
+import imutils
+CORNERS = (5, 5)
+
+
 def cal():
     import numpy as np
-    import cv2
     import glob
-    import imutils
 
     # termination criteria
     criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
 
     # prepare object points, like (0,0,0), (1,0,0), (2,0,0) ....,(6,5,0)
-    objp = np.zeros((5*5, 3), np.float32)
-    objp[:, :2] = np.mgrid[0:5, 0:5].T.reshape(-1, 2)
+    objp = np.zeros((CORNERS[0]*CORNERS[1], 3), np.float32)
+    objp[:, :2] = np.mgrid[0:CORNERS[0], 0:CORNERS[1]].T.reshape(-1, 2)
 
     # Arrays to store object points and image points from all the images.
     objpoints = []  # 3d point in real world space
     imgpoints = []  # 2d points in image plane.
     gray = None
-    images = glob.glob('cals/*.jpg')
+    images = glob.glob('cals3/*.jpg')
     for fname in images:
+        # objpoints = []  # 3d point in real world space
+        # imgpoints = []  # 2d points in image plane.
         img = cv2.imread(fname)
+        img = imutils.resize(img, width=800)
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-
         # Find the chess board corners
-        ret, corners = cv2.findChessboardCorners(gray, (5, 5), None)
+        ret, corners = cv2.findChessboardCorners(
+            gray, CORNERS, None)
 
         # If found, add object points, image points (after refining them)
         if ret == True:
@@ -32,18 +38,15 @@ def cal():
             imgpoints.append(corners2)
 
             # Draw and display the corners
-            img = cv2.drawChessboardCorners(img, (5, 5), corners2, ret)
-            img = imutils.resize(img, width=800)
-            cv2.imshow("Frame", img)
-            while True:
-                key = cv2.waitKey(1) & 0xFF
-                if key == ord("q"):
-                    break
+            img = cv2.drawChessboardCorners(
+                img, CORNERS, corners2, ret)
         ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(
             objpoints, imgpoints, gray.shape[::-1], None, None)
-        return mtx, dist, rvecs, tvecs
+        return mtx, dist, rvecs, tvecs, img
     cv2.destroyAllWindows()
 
 
 if __name__ == '__main__':
-    cal()
+    _, _, _, _, img = cal()
+    cv2.imshow("pof", img)
+    cv2.waitKey(0)
