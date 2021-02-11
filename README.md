@@ -3,10 +3,11 @@
 - `aruco_pose.py` - Run to open the camera feed and detect markers.
     - Use the `-t` or `--type` parameter when running to select the type of marker (more info below)
 - `aruco_pose_phone.py` - The same file as above, but without key presses, so it can run on the [pyto](https://www.pyto.app "Pyto  app") app on iPhones.
-- `ogetPosAndAngle.pypencv_generate_aruco.py` - This file can be used to generate pngs of aruco tags with specified type and ids
+- `opencv_generate_aruco.py` - This file can be used to generate pngs of aruco tags with specified type and ids
     - `-o`, `--output`: The output path of the png file to be created
     - `-i`, `--id`: The id of the tag to be generated
     - `-t`, `--type`: The type of tag to be generated
+- `convertTags.py` - Script to convert a directory of .jpg tags into a single printable pdf
 
 ## Folders
 -  `tags/` - The tags I have generated so far. They are all named with their type and id for easy identification.
