@@ -5,9 +5,41 @@ import time
 import cv2
 import sys
 from consts import ARUCO_DICT
+from consts import MARKER_LOCATIONS
 import configparser
 import numpy as np
 import cameracal
+
+def poseToMatrix(x, y, theta):
+    # If this function doesn't work nothing else does
+    cosTheta = np.cos(theta)
+    sinTheta = np.sin(theta)
+    arr = np.matrix([[cosFieldStart, -sinFieldStart, xFieldStart], 
+        [sinFieldStart, cosFieldStart, yFieldStart],
+        [0, 0, 1]])   
+    return arr
+
+def matrixToPose(arr):
+    # I think I have to do some sign flipping with this arccos to prevent wrap around error
+    # I think it was something like 
+    # if sin(theta) < 0 then -arccos(x)
+    # else arccos(x)
+    # Don't remember tbh need testing
+    return [arr[0][2], arr[1][2], numpy.arccos(arr[0][0])] 
+
+def matrixTransform(arr1, arr2):
+    # might be more useful to not make this a function and just do the matmul inline
+    return np.matmul(arr1,np.linalg.inv(arr2))
+    # matrixMarker * matrixCamera^-1
+    
+
+def getMarkerMatrix(id):
+    # get marker pose from dictionary
+    x = MARKER_LOCATIONS[id][0] 
+    y = MARKER_LOCATIONS[id][1]
+    theta = MARKER_LOCATIONS[id][2]
+    # convert that pose to matrix and return
+    return poseToMatrix(x,y,theta)
 
 config = configparser.ConfigParser()
 config.read("camera.ini")
@@ -53,9 +85,14 @@ while True:
             i = np.where(ids == i)
             cv2.aruco.drawAxis(frame, mtx,
                                dist, rvecs[i], tvecs[i], 0.035)
-        print(tvecs[0])
+                               
+            # robotPose = matrixToPose(matrixTransform(getMarkerMatrix(i),poseToMatrix(tvecs[i][0],tvecs[i][2],rvecs[i][0])))\
+            rot, _ = cv2.Rodrigues(rvecs[0])
+        print(str(rot[2][1]) + " " + str(rot[0][2]) + " " + str(rot[1][0]))
 
-        # show the output frame
+
+    
+    # show the output frame
     cv2.imshow("Frame", frame)
     key = cv2.waitKey(1) & 0xFF
     # if the `q` key was pressed, break from the loop
