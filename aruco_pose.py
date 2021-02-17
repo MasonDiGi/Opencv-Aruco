@@ -9,41 +9,66 @@ from consts import MARKER_LOCATIONS
 import configparser
 import numpy as np
 import cameracal
+import threading
+from networktables import NetworkTables
 
 def poseToMatrix(x, y, theta):
     # If this function doesn't work nothing else does
     cosTheta = np.cos(theta)
     sinTheta = np.sin(theta)
-    arr = np.matrix([[cosFieldStart, -sinFieldStart, xFieldStart], 
+    arr = np.matrix([[cosFieldStart, -sinFieldStart, xFieldStart],
         [sinFieldStart, cosFieldStart, yFieldStart],
-        [0, 0, 1]])   
+        [0, 0, 1]])
     return arr
 
 def matrixToPose(arr):
     # I think I have to do some sign flipping with this arccos to prevent wrap around error
-    # I think it was something like 
+    # I think it was something like
     # if sin(theta) < 0 then -arccos(x)
     # else arccos(x)
     # Don't remember tbh need testing
-    return [arr[0][2], arr[1][2], numpy.arccos(arr[0][0])] 
+    return [arr[0][2], arr[1][2], numpy.arccos(arr[0][0])]
 
 def matrixTransform(arr1, arr2):
     # might be more useful to not make this a function and just do the matmul inline
     return np.matmul(arr1,np.linalg.inv(arr2))
     # matrixMarker * matrixCamera^-1
-    
+
 
 def getMarkerMatrix(id):
     # get marker pose from dictionary
-    x = MARKER_LOCATIONS[id][0] 
+    x = MARKER_LOCATIONS[id][0]
     y = MARKER_LOCATIONS[id][1]
     theta = MARKER_LOCATIONS[id][2]
     # convert that pose to matrix and return
     return poseToMatrix(x,y,theta)
 
+# Initialize NetworkTables Connection
+# Wait for server to connect
+# cond = threading.Condition()
+# notified = [False]
+#
+# def connectionListener(connected, info):
+#      print(info, '; Connected=%s' % connected)
+#      with cond:
+#          notified[0] = True
+#          cond.notify()
+#
+# NetworkTables.initialize(server='10.0.41.104') # T41 Computer
+# NetworkTables.addConnectionListener(connectionListener, immediateNotify=True)
+#
+# with cond:
+#     print("Waiting")
+#     if not notified[0]:
+#         cond.wait()
+#
+# print("Connected!")
+#
+# table = NetworkTables.getTable('ArUco_Localization')
+
+
 config = configparser.ConfigParser()
 config.read("camera.ini")
-
 # construct the argument parser and parse the arguments
 ap = argparse.ArgumentParser()
 ap.add_argument("-t", "--type", type=str,
@@ -85,13 +110,20 @@ while True:
             i = np.where(ids == i)
             cv2.aruco.drawAxis(frame, mtx,
                                dist, rvecs[i], tvecs[i], 0.035)
-                               
+
             # robotPose = matrixToPose(matrixTransform(getMarkerMatrix(i),poseToMatrix(tvecs[i][0],tvecs[i][2],rvecs[i][0])))\
+            # rX = robotPose[0]
+            # rY = robotPose[1]
+            # rTheta = robotPose[2]
+            # table.putNumber('robotX:', rX)
+		    # table.putNumber('robotY:', rY)
+		    # table.putNumber('robotTheta:', rTheta)
+
             rot, _ = cv2.Rodrigues(rvecs[0])
         print(str(rot[2][1]) + " " + str(rot[0][2]) + " " + str(rot[1][0]))
 
 
-    
+
     # show the output frame
     cv2.imshow("Frame", frame)
     key = cv2.waitKey(1) & 0xFF
