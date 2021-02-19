@@ -10,6 +10,7 @@ import configparser
 import numpy as np
 import cameracal
 import threading
+import math
 from networktables import NetworkTables
 
 def poseToMatrix(x, y, theta):
@@ -27,7 +28,7 @@ def matrixToPose(arr):
     # if sin(theta) < 0 then -arccos(x)
     # else arccos(x)
     # Don't remember tbh need testing
-    return [arr[0][2], arr[1][2], numpy.arccos(arr[0][0])]
+    return [arr[0][2], arr[1][2], np.arccos(arr[0][0])]
 
 def matrixTransform(arr1, arr2):
     # might be more useful to not make this a function and just do the matmul inline
@@ -42,6 +43,37 @@ def getMarkerMatrix(id):
     theta = MARKER_LOCATIONS[id][2]
     # convert that pose to matrix and return
     return poseToMatrix(x,y,theta)
+
+# Checks if a matrix is a valid rotation matrix.
+def isRotationMatrix(R) :
+    Rt = np.transpose(R)
+    shouldBeIdentity = np.dot(Rt, R)
+    I = np.identity(3, dtype = R.dtype)
+    n = np.linalg.norm(I - shouldBeIdentity)
+    return n < 1e-6
+
+
+# Calculates rotation matrix to euler angles
+# The result is the same as MATLAB except the order
+# of the euler angles ( x and z are swapped ).
+def rotationMatrixToEulerAngles(R) :
+
+    assert(isRotationMatrix(R))
+    
+    sy = math.sqrt(R[0,0] * R[0,0] +  R[1,0] * R[1,0])
+    
+    singular = sy < 1e-6
+
+    if  not singular :
+        x = math.atan2(R[2,1] , R[2,2])
+        y = math.atan2(-R[2,0], sy)
+        z = math.atan2(R[1,0], R[0,0])
+    else :
+        x = math.atan2(-R[1,2], R[1,1])
+        y = math.atan2(-R[2,0], sy)
+        z = 0
+
+    return np.array([x, y, z])
 
 # Initialize NetworkTables Connection
 # Wait for server to connect
@@ -89,7 +121,7 @@ arucoDict = cv2.aruco.Dictionary_get(ARUCO_DICT[args["type"]])
 arucoParams = cv2.aruco.DetectorParameters_create()
 # initialize the video stream and allow the camera sensor to warm up
 print("[INFO] starting video stream...")
-vs = VideoStream(src=0).start()
+vs = VideoStream(src=2).start()
 time.sleep(2.0)
 
 # loop over the frames from the video stream
@@ -120,11 +152,13 @@ while True:
 		    # table.putNumber('robotTheta:', rTheta)
 
             rot, _ = cv2.Rodrigues(rvecs[0])
-        print(str(rot[2][1]) + " " + str(rot[0][2]) + " " + str(rot[1][0]))
+        print(str(rotationMatrixToEulerAngles(rot)))
+        #print(str(rot[2][1]) + " " + str(rot[0][2]) + " " + str(rot[1][0]))
 
 
 
     # show the output frame
+    frame = cv2.flip(frame, 1)
     cv2.imshow("Frame", frame)
     key = cv2.waitKey(1) & 0xFF
     # if the `q` key was pressed, break from the loop
