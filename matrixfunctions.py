@@ -6,8 +6,8 @@ def poseToMatrix(x, y, theta):
     # If this function doesn't work nothing else does
     cosTheta = np.cos(theta)
     sinTheta = np.sin(theta)
-    arr = np.matrix([[cosFieldStart, -sinFieldStart, xFieldStart],
-        [sinFieldStart, cosFieldStart, yFieldStart],
+    arr = np.matrix([[cosTheta, -sinTheta, x],
+        [sinTheta, cosTheta, y],
         [0, 0, 1]])
     return arr
 
@@ -17,7 +17,7 @@ def matrixToPose(arr):
     # if sin(theta) < 0 then -arccos(x)
     # else arccos(x)
     # Don't remember tbh need testing
-    return [arr[0][2], arr[1][2], np.arccos(arr[0][0])]
+    return [arr[0, 2], arr[1, 2], np.arccos(arr[0, 0])]
 
 def matrixTransform(arr1, arr2):
     # might be more useful to not make this a function and just do the matmul inline

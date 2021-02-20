@@ -80,20 +80,17 @@ while True:
             i = np.where(ids == i)
             cv2.aruco.drawAxis(frame, mtx,
                                dist, rvecs[i], tvecs[i], 0.035)
-
-            # robotPose = mf.matrixToPose(mf.matrixTransform(mf.getMarkerMatrix(i),mf.poseToMatrix(tvecs[i][0],tvecs[i][2],rvecs[i][0])))
+            rot, _ = cv2.Rodrigues(rvecs[0])
+            euler =  mf.rotationMatrixToEulerAngles(rot)
+            # arr = mf.matrixTransform(mf.getMarkerMatrix(ids[i][0]),mf.poseToMatrix(tvecs[i][0][0],tvecs[i][0][2],euler[1]))
+            robotPose = mf.matrixToPose(mf.matrixTransform(mf.getMarkerMatrix(ids[i][0]),mf.poseToMatrix(tvecs[i][0][0],tvecs[i][0][2],euler[1])))
             # rX = robotPose[0]
             # rY = robotPose[1]
             # rTheta = robotPose[2]
             # table.putNumber('robotX:', rX)
 		    # table.putNumber('robotY:', rY)
 		    # table.putNumber('robotTheta:', rTheta)
-
-            rot, _ = cv2.Rodrigues(rvecs[0])
-        print(str(mf.rotationMatrixToEulerAngles(rot)))
-        #print(str(rot[2][1]) + " " + str(rot[0][2]) + " " + str(rot[1][0]))
-
-
+        print(str(robotPose))
 
     # show the output frame
     frame = cv2.flip(frame, 1)
