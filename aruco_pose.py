@@ -12,6 +12,7 @@ import cameracal
 import matrixfunctions as mf
 import threading
 from networktables import NetworkTables
+import realsenseFuncs as rsf
 
 # Initialize NetworkTables Connection
 # Wait for server to connect
@@ -37,14 +38,15 @@ from networktables import NetworkTables
 # table = NetworkTables.getTable('ArUco_Localization')
 
 
-config = configparser.ConfigParser()
-config.read("camera.ini")
 # construct the argument parser and parse the arguments
 ap = argparse.ArgumentParser()
 ap.add_argument("-t", "--type", type=str,
                 default="DICT_ARUCO_ORIGINAL",
                 help="type of ArUCo tag to detect")
 args = vars(ap.parse_args())
+
+# Start realsense pipe
+pipe = rsf.init()
 
 mtx, dist, rvecs, tvecs, _ = cameracal.cal()
 
@@ -64,6 +66,9 @@ time.sleep(2.0)
 
 # loop over the frames from the video stream
 while True:
+    # PoseExists returns true if there is a pose, otherwise don't compute during this cycle
+    poseExists, odomX, odomY, odomZ, odomTheta = rsf.getPose(pipe)
+    
     # grab the frame from the threaded video stream and resize it
     # to have a maximum width of 1000 pixels
     frame = vs.read()
