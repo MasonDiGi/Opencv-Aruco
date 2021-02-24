@@ -19,7 +19,7 @@ def matrixToPose(arr):
     # Don't remember tbh need testing
     return [arr[0, 2], arr[1, 2], np.arccos(arr[0, 0])]
 
-def matrixTransform(arr1, arr2):
+def matrixInverseMultipy(arr1, arr2):
     # might be more useful to not make this a function and just do the matmul inline
     return np.matmul(arr1,np.linalg.inv(arr2))
     # matrixMarker * matrixCamera^-1
@@ -45,9 +45,9 @@ def isRotationMatrix(R) :
 def rotationMatrixToEulerAngles(R) :
 
     assert(isRotationMatrix(R))
-    
+
     sy = math.sqrt(R[0,0] * R[0,0] +  R[1,0] * R[1,0])
-    
+
     singular = sy < 1e-6
 
     if  not singular :
