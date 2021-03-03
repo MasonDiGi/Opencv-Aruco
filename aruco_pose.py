@@ -46,7 +46,7 @@ ap.add_argument("-t", "--type", type=str,
 args = vars(ap.parse_args())
 
 # Start realsense pipe
-pipe = rsf.init()
+#########################pipe = rsf.init()##########################################
 
 mtx, dist, rvecs, tvecs, _ = cameracal.cal()
 
@@ -67,47 +67,48 @@ time.sleep(2.0)
 # loop over the frames from the video stream
 while True:
     # PoseExists returns true if there is a pose, otherwise don't compute during this cycle
-    poseExists, odomX, odomY, odomZ, odomTheta = rsf.getPose(pipe)
+    ## poseExists, odomX, odomY, odomZ, odomTheta = rsf.getPose(pipe)
     # If realsense isn't getting anything we're screwed basically
-    if poseExists:
+    ## if poseExists:
         # Construct matrix for the realsense in relation to the Odom DICT
-        odomToRobotMatrix = mf.poseToMatrix(odomX,odomZ,odomTheta)
+        ## odomToRobotMatrix = mf.poseToMatrix(odomX,odomZ,odomTheta)
         # Empty matrix to be filled in later with matrix for the odom origin in realtion to the map
-        mapToOdomMatrix = np.matrix([[0,0,0], [0,0,0],[0,0,0]])
+        ## mapToOdomMatrix = np.matrix([[0,0,0], [0,0,0],[0,0,0]])
 
         # grab the frame from the threaded video stream and resize it
         # to have a maximum width of 1000 pixels
-        frame = vs.read()
-        frame = imutils.resize(frame, width=800)
-        # detect ArUco markers in the input frame
-        (corners, ids, rejected) = cv2.aruco.detectMarkers(
-            frame, arucoDict, parameters=arucoParams)
+    frame = vs.read()
+    frame = imutils.resize(frame, width=800)
+    # detect ArUco markers in the input frame
+    (corners, ids, rejected) = cv2.aruco.detectMarkers(
+        frame, arucoDict, parameters=arucoParams)
 
-        # verify at least one ArUco marker was detected
-        if len(corners) > 0:
-            cv2.aruco.drawDetectedMarkers(frame, corners, ids)
-            rvecs, tvecs, _ = cv2.aruco.estimatePoseSingleMarkers(
-                corners, 0.079, mtx, dist, np.float32(rvecs), np.float32(tvecs))
-            for i in ids:
-                i = np.where(ids == i)
-                cv2.aruco.drawAxis(frame, mtx,
-                                   dist, rvecs[i], tvecs[i], 0.035)
-                rot, _ = cv2.Rodrigues(rvecs[0])
-                euler =  mf.rotationMatrixToEulerAngles(rot)
-                # Construct matrix for the marker in relation to the map
-                mapToArucoMatrix = mf.getMarkerMatrix(ids[i][0])
-                # Construct matrix for the robot in relation to the marker
-                arucoX = tvecs[i][0][0]
-                arucoZ = tvecs[i][0][2]
-                arucoYRot = euler[1]
-                robotToArucoMatrix = mf.poseToMatrix(arucoX,arucoZ,arucoYRot)
-                # Homogenous Matrix Transformation to get Robot in Relation to Map
-                mapToRobotMatrix = mf.matrixInverseMultipy(mapToArucoMatrix,robotToArucoMatrix)
-                # Homogenous Matrix Transformation to get map in Relation to Odom matrix
-                mapToOdomMatrix = mf.matrixInverseMultipy(mapToRobotMatrix,odomToRobotMatrix)
-
-        robotPose = mf.matrixToPose(np.matmul(mapToOdomMatrix,odomToRobotMatrix))
-        print(str(robotPose))
+    # verify at least one ArUco marker was detected
+    if len(corners) > 0:
+        cv2.aruco.drawDetectedMarkers(frame, corners, ids)
+        rvecs, tvecs, _ = cv2.aruco.estimatePoseSingleMarkers(
+            corners, 0.079, mtx, dist, np.float32(rvecs), np.float32(tvecs))
+        for i in ids:
+            i = np.where(ids == i)
+            cv2.aruco.drawAxis(frame, mtx,
+                                dist, rvecs[i], tvecs[i], 0.035)
+            rot, _ = cv2.Rodrigues(rvecs[0])
+            euler =  mf.rotationMatrixToEulerAngles(rot)
+            # Construct matrix for the marker in relation to the map
+            mapToArucoMatrix = mf.getMarkerMatrix(ids[i][0])
+            # Construct matrix for the robot in relation to the marker
+            arucoX = tvecs[i][0][0]
+            arucoZ = tvecs[i][0][2]
+            arucoYRot = euler[1]
+            robotToArucoMatrix = mf.poseToMatrix(arucoX,arucoZ,arucoYRot)
+            # Homogenous Matrix Transformation to get Robot in Relation to Map
+            mapToRobotMatrix = mf.matrixInverseMultipy(mapToArucoMatrix,robotToArucoMatrix)
+            print(f"X: {arucoX} Z: {arucoZ} theta: {arucoYRot}")
+            # Homogenous Matrix Transformation to get map in Relation to Odom matrix
+            ## mapToOdomMatrix = mf.matrixInverseMultipy(mapToRobotMatrix,odomToRobotMatrix)
+    robotPose = mf.matrixToPose(mapToRobotMatrix)
+    ##robotPose = mf.matrixToPose(np.matmul(mapToOdomMatrix,odomToRobotMatrix))
+    # print(str(robotPose))
 
     # show the output frame
     frame = cv2.flip(frame, 1)

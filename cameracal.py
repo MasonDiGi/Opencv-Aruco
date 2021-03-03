@@ -1,6 +1,6 @@
 import cv2
 import imutils
-CORNERS = (7, 6)
+CORNERS = (6, 9)
 
 
 def cal():
@@ -18,7 +18,7 @@ def cal():
     objpoints = []  # 3d point in real world space
     imgpoints = []  # 2d points in image plane.
     gray = None
-    images = glob.glob('calsLogitech/*.png')
+    images = glob.glob('calsLogitech2/*.jpg')
     for fname in images:
         # objpoints = []  # 3d point in real world space
         # imgpoints = []  # 2d points in image plane.
@@ -27,7 +27,7 @@ def cal():
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         # Find the chess board corners
         ret, corners = cv2.findChessboardCorners(
-            gray, CORNERS, None)
+            gray, CORNERS)
 
         # If found, add object points, image points (after refining them)
         if ret == True:
@@ -39,11 +39,10 @@ def cal():
 
             # Draw and display the corners
             # img = cv2.drawChessboardCorners(
-                # img, CORNERS, corners2, ret)
+            #     img, CORNERS, corners2, ret)
             # cv2.imshow('img',img)
-            # cv2.waitKey(100)
+            # cv2.waitKey(0)
     cv2.destroyAllWindows()
-
     ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(
         objpoints, imgpoints, gray.shape[::-1], None, None)
     return mtx, dist, rvecs, tvecs, img
