@@ -18,11 +18,7 @@ def cal():
     objpoints = []  # 3d point in real world space
     imgpoints = []  # 2d points in image plane.
     gray = None
-<<<<<<< HEAD
-    images = glob.glob('calsLogitech2/*.jpg')
-=======
     images = glob.glob('calsLogitech/*png')
->>>>>>> 23f537d9c56029d55e59742952af2452297f1197
     for fname in images:
         # objpoints = []  # 3d point in real world space
         # imgpoints = []  # 2d points in image plane.
