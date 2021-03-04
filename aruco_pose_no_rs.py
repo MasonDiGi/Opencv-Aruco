@@ -8,7 +8,7 @@ from consts import ARUCO_DICT
 from consts import MARKER_LOCATIONS
 import configparser
 import numpy as np
-import cameracal
+import cameracalcharuco
 import matrixfunctions as mf
 import threading
 from networktables import NetworkTables
@@ -45,7 +45,7 @@ ap.add_argument("-t", "--type", type=str,
                 help="type of ArUCo tag to detect")
 args = vars(ap.parse_args())
 
-mtx, dist, rvecs, tvecs, _ = cameracal.cal()
+mtx, dist, rvecs, tvecs = cameracalcharuco.cal()
 
 # verify that the supplied ArUCo tag exists and is supported by OpenCV
 if ARUCO_DICT.get(args["type"], None) is None:
@@ -75,7 +75,7 @@ while True:
     if len(corners) > 0:
         cv2.aruco.drawDetectedMarkers(frame, corners, ids)
         rvecs, tvecs, _ = cv2.aruco.estimatePoseSingleMarkers(
-            corners, 0.127, mtx, dist, np.float32(rvecs), np.float32(tvecs))
+            corners, 0.105, mtx, dist, np.float32(rvecs), np.float32(tvecs))
         for i in ids:
             i = np.where(ids == i)
             cv2.aruco.drawAxis(frame, mtx,
@@ -93,10 +93,10 @@ while True:
             mapToRobotMatrix = mf.matrixInverseMultipy(mapToArucoMatrix,robotToArucoMatrix)
 
             robotPose = mf.matrixToPose(mapToRobotMatrix)
-            print(str(robotPose))
-            print(f"X: {arucoX} Z: {arucoZ} YRot: {arucoYRot}")
-            print(str(ids[i][0]))
-
+            # print(str(robotPose))
+            # print(f"X: {arucoX} Z: {arucoZ} YRot: {arucoYRot}")
+            # print(str(ids[i][0]))
+            print(str(tvecs))
     # show the output frame
     frame = cv2.flip(frame, 1)
     cv2.imshow("Frame", frame)

@@ -18,7 +18,7 @@ def cal():
     objpoints = []  # 3d point in real world space
     imgpoints = []  # 2d points in image plane.
     gray = None
-    images = glob.glob('calsLogitech/*png')
+    images = glob.glob('calsLogitech3/*.jpg')
     for fname in images:
         # objpoints = []  # 3d point in real world space
         # imgpoints = []  # 2d points in image plane.
@@ -38,10 +38,10 @@ def cal():
             imgpoints.append(corners2)
 
             # Draw and display the corners
-            # img = cv2.drawChessboardCorners(
-            #     img, CORNERS, corners2, ret)
-            # cv2.imshow('img',img)
-            # cv2.waitKey(0)
+            img = cv2.drawChessboardCorners(
+                img, CORNERS, corners2, ret)
+            cv2.imshow('img',img)
+            cv2.waitKey(1000)
     cv2.destroyAllWindows()
     ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(
         objpoints, imgpoints, gray.shape[::-1], None, None)
