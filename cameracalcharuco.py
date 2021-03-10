@@ -14,8 +14,8 @@ def cal():
     CHARUCO_BOARD = aruco.CharucoBoard_create(
             squaresX=CHARUCOBOARD_COLCOUNT,
             squaresY=CHARUCOBOARD_ROWCOUNT,
-            squareLength=0.025,
-            markerLength=0.015,
+            squareLength=0.028,
+            markerLength=0.014,
             dictionary=ARUCO_DICT)
 
     # Create the arrays and variables we'll use to store info like corners and IDs from images processed
@@ -75,8 +75,8 @@ def cal():
             proportion = max(img.shape) / 1000.0
             img = cv2.resize(img, (int(img.shape[1]/proportion), int(img.shape[0]/proportion)))
             # Pause to display each image, waiting for key press
-            # cv2.imshow('Charuco board', img)
-            # cv2.waitKey(0)
+            cv2.imshow('Charuco board', img)
+            cv2.waitKey(0)
         else:
             print("Not able to detect a charuco board in image: {}".format(iname))
 
