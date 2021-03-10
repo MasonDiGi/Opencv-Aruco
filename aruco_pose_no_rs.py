@@ -14,6 +14,9 @@ import threading
 from networktables import NetworkTables
 import realsenseFuncs as rsf
 
+def back(*args):
+    pass
+
 # Initialize NetworkTables Connection
 # Wait for server to connect
 # cond = threading.Condition()
@@ -56,9 +59,10 @@ if ARUCO_DICT.get(args["type"], None) is None:
 print(f"[INFO] detecting '{args['type']}' tags...")
 arucoDict = cv2.aruco.Dictionary_get(ARUCO_DICT[args["type"]])
 arucoParams = cv2.aruco.DetectorParameters_create()
+
 # initialize the video stream and allow the camera sensor to warm up
 print("[INFO] starting video stream...")
-vs = VideoStream(src=1).start()
+vs = VideoStream(src=2).start()
 time.sleep(2.0)
 
 # loop over the frames from the video stream
@@ -70,7 +74,6 @@ while True:
     # detect ArUco markers in the input frame
     (corners, ids, rejected) = cv2.aruco.detectMarkers(
         frame, arucoDict, parameters=arucoParams)
-
     # verify at least one ArUco marker was detected
     if len(corners) > 0:
         cv2.aruco.drawDetectedMarkers(frame, corners, ids)
