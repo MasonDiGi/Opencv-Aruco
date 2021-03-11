@@ -13,6 +13,8 @@ import matrixfunctions as mf
 import threading
 from networktables import NetworkTables
 import realsenseFuncs as rsf
+import pickle
+
 
 def back(*args):
     pass
@@ -48,7 +50,11 @@ ap.add_argument("-t", "--type", type=str,
                 help="type of ArUCo tag to detect")
 args = vars(ap.parse_args())
 
-mtx, dist, rvecs, tvecs = cameracalcharuco.cal()
+# Old calibration
+# mtx, dist, rvecs, tvecs = cameracalcharuco.cal()
+# New calibration
+with open("cals/calibration.pkl", 'rb') as f:
+    mtx, dist, rvecs, tvecs = pickle.load(f)
 
 # verify that the supplied ArUCo tag exists and is supported by OpenCV
 if ARUCO_DICT.get(args["type"], None) is None:
@@ -62,7 +68,7 @@ arucoParams = cv2.aruco.DetectorParameters_create()
 
 # initialize the video stream and allow the camera sensor to warm up
 print("[INFO] starting video stream...")
-vs = VideoStream(src=2).start()
+vs = VideoStream(src=1).start()
 time.sleep(2.0)
 
 # loop over the frames from the video stream
@@ -84,16 +90,17 @@ while True:
             cv2.aruco.drawAxis(frame, mtx,
                                dist, rvecs[i], tvecs[i], 0.035)
             rot, _ = cv2.Rodrigues(rvecs[0])
-            euler =  mf.rotationMatrixToEulerAngles(rot)
+            euler = mf.rotationMatrixToEulerAngles(rot)
             # Construct matrix for the marker in relation to the map
             mapToArucoMatrix = mf.getMarkerMatrix(ids[i][0])
             # Construct matrix for the robot in relation to the marker
             arucoX = tvecs[i][0][0]
             arucoZ = tvecs[i][0][2]
             arucoYRot = euler[1]
-            robotToArucoMatrix = mf.poseToMatrix(arucoX,arucoZ,arucoYRot)
+            robotToArucoMatrix = mf.poseToMatrix(arucoX, arucoZ, arucoYRot)
             # Homogenous Matrix Transformation to get Robot in Relation to Map
-            mapToRobotMatrix = mf.matrixInverseMultipy(mapToArucoMatrix,robotToArucoMatrix)
+            mapToRobotMatrix = mf.matrixInverseMultipy(
+                mapToArucoMatrix, robotToArucoMatrix)
 
             robotPose = mf.matrixToPose(mapToRobotMatrix)
             # print(str(robotPose))
@@ -101,7 +108,7 @@ while True:
             # print(str(ids[i][0]))
             print(str(tvecs))
     # show the output frame
-    frame = cv2.flip(frame, 1)
+    # frame = cv2.flip(frame, 1)
     cv2.imshow("Frame", frame)
     key = cv2.waitKey(1) & 0xFF
     # if the `q` key was pressed, break from the loop
