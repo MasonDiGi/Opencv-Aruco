@@ -53,7 +53,7 @@ args = vars(ap.parse_args())
 # Old calibration
 # mtx, dist, rvecs, tvecs = cameracalcharuco.cal()
 # New calibration
-with open("cals/calibration.pkl", 'rb') as f:
+with open("charucoCals/calibration.pkl", 'rb') as f:
     mtx, dist, rvecs, tvecs = pickle.load(f)
 
 # verify that the supplied ArUCo tag exists and is supported by OpenCV
@@ -69,7 +69,7 @@ arucoParams = cv2.aruco.DetectorParameters_create()
 # initialize the video stream and allow the camera sensor to warm up
 print("[INFO] starting video stream...")
 vs = VideoStream(src=1).start()
-time.sleep(2.0)
+time.sleep(2.0)+
 
 # loop over the frames from the video stream
 while True:
@@ -84,7 +84,7 @@ while True:
     if len(corners) > 0:
         cv2.aruco.drawDetectedMarkers(frame, corners, ids)
         rvecs, tvecs, _ = cv2.aruco.estimatePoseSingleMarkers(
-            corners, 0.105, mtx, dist, np.float32(rvecs), np.float32(tvecs))
+            corners, 0.08, mtx, dist, np.float32(rvecs), np.float32(tvecs))
         for i in ids:
             i = np.where(ids == i)
             cv2.aruco.drawAxis(frame, mtx,

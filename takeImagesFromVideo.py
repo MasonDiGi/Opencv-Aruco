@@ -6,7 +6,7 @@ import cv2
 print("[INFO] starting video stream...")
 vs = VideoStream(src=1).start()
 time.sleep(2.0)
-num = 37
+num = 1
 
 while True:
     frame = vs.read()
@@ -16,5 +16,5 @@ while True:
     key = cv2.waitKey(1) & 0xFF
     # if the `q` key was pressed, break from the loop
     if key == ord("q"):
-        cv2.imwrite(f"cals/Charcuo_cal_{num}.jpg", frame)
+        cv2.imwrite(f"charucoCals/Charcuo_cal_{num}.jpg", frame)
         num += 1

@@ -4,7 +4,7 @@ from cv2 import aruco
 import glob
 import pickle
 
-FOLDER = "cals"
+FOLDER = "charucoCals"
 IM_TYPE = "jpg"
 
 
