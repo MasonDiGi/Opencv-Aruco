@@ -14,6 +14,7 @@ import threading
 from networktables import NetworkTables
 import realsenseFuncs as rsf
 import pickle
+from markerToField import getMarkerPose
 
 
 def back(*args):
@@ -53,7 +54,7 @@ args = vars(ap.parse_args())
 # Old calibration
 # mtx, dist, rvecs, tvecs = cameracalcharuco.cal()
 # New calibration
-with open("charucoCals/calibration.pkl", 'rb') as f:
+with open("calsLogitechCharuco2/calibration.pkl", 'rb') as f:
     mtx, dist, rvecs, tvecs = pickle.load(f)
 
 # verify that the supplied ArUCo tag exists and is supported by OpenCV
@@ -68,15 +69,14 @@ arucoParams = cv2.aruco.DetectorParameters_create()
 
 # initialize the video stream and allow the camera sensor to warm up
 print("[INFO] starting video stream...")
-vs = VideoStream(src=1).start()
-time.sleep(2.0)+
+vs = VideoStream(src=2).start()
+time.sleep(2.0)
 
 # loop over the frames from the video stream
 while True:
     # grab the frame from the threaded video stream and resize it
     # to have a maximum width of 1000 pixels
     frame = vs.read()
-    frame = imutils.resize(frame, width=800)
     # detect ArUco markers in the input frame
     (corners, ids, rejected) = cv2.aruco.detectMarkers(
         frame, arucoDict, parameters=arucoParams)
@@ -84,7 +84,7 @@ while True:
     if len(corners) > 0:
         cv2.aruco.drawDetectedMarkers(frame, corners, ids)
         rvecs, tvecs, _ = cv2.aruco.estimatePoseSingleMarkers(
-            corners, 0.08, mtx, dist, np.float32(rvecs), np.float32(tvecs))
+            corners, 0.105, mtx, dist, np.float32(rvecs), np.float32(tvecs))
         for i in ids:
             i = np.where(ids == i)
             cv2.aruco.drawAxis(frame, mtx,
@@ -106,7 +106,9 @@ while True:
             # print(str(robotPose))
             # print(f"X: {arucoX} Z: {arucoZ} YRot: {arucoYRot}")
             # print(str(ids[i][0]))
-            print(str(tvecs))
+            # norm = np.linalg.norm(rvecs)
+            # print(norm)
+            getMarkerPose(ids[i][0], tvecs[0], rvecs)
     # show the output frame
     # frame = cv2.flip(frame, 1)
     cv2.imshow("Frame", frame)

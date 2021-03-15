@@ -30,7 +30,6 @@ def matrixInverseMultipy(arr1, arr2):
 
 def getMarkerMatrix(id):
     # get marker pose from dictionary
-    print(id)
     x = MARKER_LOCATIONS[id][0]
     y = MARKER_LOCATIONS[id][1]
     theta = MARKER_LOCATIONS[id][2]

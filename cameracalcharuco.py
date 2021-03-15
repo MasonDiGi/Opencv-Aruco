@@ -4,7 +4,7 @@ from cv2 import aruco
 import glob
 import pickle
 
-FOLDER = "charucoCals"
+FOLDER = "calsLogitechCharuco2"
 IM_TYPE = "jpg"
 
 
@@ -18,8 +18,8 @@ def cal():
     CHARUCO_BOARD = aruco.CharucoBoard_create(
         squaresX=CHARUCOBOARD_COLCOUNT,
         squaresY=CHARUCOBOARD_ROWCOUNT,
-        squareLength=0.03,
-        markerLength=0.015,
+        squareLength=0.028,
+        markerLength=0.014,
         dictionary=ARUCO_DICT)
 
     # Create the arrays and variables we'll use to store info like corners and IDs from images processed
