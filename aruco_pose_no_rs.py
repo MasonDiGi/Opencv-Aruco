@@ -84,11 +84,11 @@ while True:
     if len(corners) > 0:
         cv2.aruco.drawDetectedMarkers(frame, corners, ids)
         rvecs, tvecs, _ = cv2.aruco.estimatePoseSingleMarkers(
-            corners, 0.105, mtx, dist, np.float32(rvecs), np.float32(tvecs))
+            corners, 0.1016, mtx, dist, np.float32(rvecs), np.float32(tvecs))
         for i in ids:
             i = np.where(ids == i)
             cv2.aruco.drawAxis(frame, mtx,
-                               dist, rvecs[i], tvecs[i], 0.035)
+                               dist, rvecs[i], tvecs[i], 0.05)
             rot, _ = cv2.Rodrigues(rvecs[0])
             euler = mf.rotationMatrixToEulerAngles(rot)
             # Construct matrix for the marker in relation to the map

@@ -13,13 +13,14 @@ def getMarkerPose(i, tvecs, rvecs):
     th = marker[2]
     x = marker[0]
     y = marker[1]
-    z = 0.12
+    z = 0.08
+    robotZ = 0.093
 
     # Marker Rotation
     rot, _ = cv2.Rodrigues(rvecs)
     Tr2cm = np.matrix([[1, 0, 0,   0  ],
                        [0, 1, 0,   0  ], 
-                       [0, 0, 1, 0.093], 
+                       [0, 0, 1, robotZ], 
                        [0, 0, 0,   1  ]])
     Tcm2co = np.matrix([[0 , 0 , 1, 0],
                         [-1, 0 , 0, 0],
@@ -34,7 +35,6 @@ def getMarkerPose(i, tvecs, rvecs):
                           [rot[2, 0], rot[2, 1], rot[2, 2], tvecs[0, 2]],
                           [    0    ,     0    ,     0    ,      1     ]])
 
-    first = np.matmul(Tr2cm, Tcm2co)
-    inv = np.linalg.inv(np.matmul(first, Tmeasure))
+    inv = np.linalg.inv(np.matmul(np.matmul(Tr2cm, Tcm2co), Tmeasure))
     Tm2r = np.matmul(inv, Tmarker)
     print(Tm2r)
