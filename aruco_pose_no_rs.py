@@ -47,7 +47,7 @@ def back(*args):
 # construct the argument parser and parse the arguments
 ap = argparse.ArgumentParser()
 ap.add_argument("-t", "--type", type=str,
-                default="DICT_ARUCO_ORIGINAL",
+                default="DICT_5X5_250",
                 help="type of ArUCo tag to detect")
 args = vars(ap.parse_args())
 
