@@ -26,9 +26,9 @@ ARUCO_DICT = {
 }
 
 
-# (x, z, theta, field id)
+# (x, y, theta, field id)
 MARKER_LOCATIONS = {
-    1: (0.13, 0.9, 180, "B1"),
+    1: (1.3, 0.9, 180, "B1"),
     2: (0, 0, 0, "B2"),
     3: (0, 0, 0, "B3"),
     4: (0, 0, 0, "B4"),

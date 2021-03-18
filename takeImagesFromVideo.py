@@ -6,7 +6,7 @@ import cv2
 print("[INFO] starting video stream...")
 vs = VideoStream(src=2).start()
 time.sleep(2.0)
-num = 2
+num = 1
 
 while True:
     frame = vs.read()

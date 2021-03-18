@@ -88,7 +88,7 @@ while True:
         for i in ids:
             i = np.where(ids == i)
             cv2.aruco.drawAxis(frame, mtx,
-                               dist, rvecs[i], tvecs[i], 0.05)
+                               dist, rvecs[i], tvecs[i], 0.1)
             rot, _ = cv2.Rodrigues(rvecs[0])
             euler = mf.rotationMatrixToEulerAngles(rot)
             # Construct matrix for the marker in relation to the map
