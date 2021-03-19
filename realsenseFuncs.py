@@ -36,7 +36,7 @@ def getPose(pipe):
         # Quaternion to Euler Angle conversions (wikipedia)
         # Used for  yaw, but swapped axes so it is around the y axis
         angle = math.atan2(2 * ((w * y) + (z * x)), 1 - 2 * ((x * x) + (y * y)))  # angle in radians (pi to -pi)
-        odomToRealsense = mf.poseToMatrix(x,z,angle)
+        odomToRealsense = mf.poseToMatrix(z, y,angle)
         realsenseToRobot = mf.poseToMatrix(21.35124, 13.871702, math.pi/2)
 
         return True, odomToRealsense*realsenseToRobot
