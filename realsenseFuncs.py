@@ -1,3 +1,5 @@
+import math
+
 def init():
     import pyrealsense2 as rs
 
@@ -15,24 +17,29 @@ def init():
 
 
 def getPose(pipe):
-        frames = pipe.wait_for_frames()
+    import matrixfunctions as mf
+    frames = pipe.wait_for_frames()
 
-        # Fetch pose frame
-        pose = frames.get_pose_frame()
-        if pose:
-            # Print some of the pose data to the terminal
-            data = pose.get_pose_data()
-            xPos = data.translation.x
-            yPos = data.translation.y
-            zPos = data.translation.z
-            x = data.rotation.x
-            y = data.rotation.y
-            z = data.rotation.z
-            w = data.rotation.w
+    # Fetch pose frame
+    pose = frames.get_pose_frame()
+    if pose:
+        # Print some of the pose data to the terminal
+        data = pose.get_pose_data()
+        xPos = data.translation.x
+        yPos = data.translation.y
+        zPos = data.translation.z
+        x = data.rotation.x
+        y = data.rotation.y
+        z = data.rotation.z
+        w = data.rotation.w
 
-            # Quaternion to Euler Angle conversions (wikipedia)
-            # Used for  yaw, but swapped axes so it is around the y axis
-            angle = math.atan2(2 * ((w * y) + (z * x)), 1 - 2 * ((x * x) + (y * y)))  # angle in radians (pi to -pi)
-            return True, x, y, z, angle
-        else:
-            return False, 0, 0, 0, 0
+        # Quaternion to Euler Angle conversions (wikipedia)
+        # Used for  yaw, but swapped axes so it is around the y axis
+        angle = math.atan2(2 * ((w * y) + (z * x)), 1 - 2 * ((x * x) + (y * y)))  # angle in radians (pi to -pi)
+        odomToRealsense = mf.poseToMatrix(x,z,angle)
+        realsenseToRobot = mf.poseToMatrix(21.35124, 13.871702, math.pi/2)
+
+        return True, odomToRealsense*realsenseToRobot
+    else:
+        return False, 0, 0, 0, 0
+
