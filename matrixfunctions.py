@@ -19,7 +19,11 @@ def matrixToPose(arr):
     # if sin(theta) < 0 then -arccos(x)
     # else arccos(x)
     # Don't remember tbh need testing
-    return [arr[0, 2], arr[1, 2], np.arccos(arr[0, 0])]
+    angle = np.arccos(arr[0,0])
+
+    if(arr[1,0] < 0):
+        angle *= -1
+    return [arr[0, 2], arr[1, 2], angle]
 
 
 def matrixInverseMultipy(arr1, arr2):

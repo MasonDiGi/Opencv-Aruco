@@ -15,7 +15,7 @@ def getMarkerPose(i, tvecs, rvecs):
     th = radians(th)
     x = marker[0]
     y = marker[1]
-    z = 0.08
+    z = 0.08+0.33
     robotZ = 0.5842
     robotX = 0.26813256
     robotY = 0.01565

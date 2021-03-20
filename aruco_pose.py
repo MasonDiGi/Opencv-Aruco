@@ -67,17 +67,19 @@ print("[INFO] starting video stream...")
 vs = VideoStream(src=0).start()
 time.sleep(2.0)
 
+mapToOdomMatrix = np.matrix([[1,0,0], [0,1,0],[0,0,1]])
+
 # loop over the frames from the video stream
 while True:
     # PoseExists returns true if there is a pose, otherwise don't compute during this cycle
     poseExists, RSmatrix = rsf.getPose(pipe)
-    odomX, odomZ, odomTheta = mf.matrixToPose(RSmatrix)
+    odomX, odomY, odomTheta = mf.matrixToPose(RSmatrix)
+    print(f"odomX: {odomX}; odomY: {odomY}, odomTheta: {odomTheta}")
     # If realsense isn't getting anything we're screwed basically
     if poseExists:
         # Construct matrix for the realsense in relation to the Odom DICT
-        odomToRobotMatrix = mf.poseToMatrix(odomX,odomZ,odomTheta)
+        odomToRobotMatrix = mf.poseToMatrix(odomX, odomY,odomTheta)
         # Empty matrix to be filled in later with matrix for the odom origin in realtion to the map
-        mapToOdomMatrix = np.matrix([[1,0,0], [0,1,0],[0,0,1]])
 
         # grab the frame from the threaded video stream and resize it
         # to have a maximum width of 1000 pixels
@@ -92,7 +94,6 @@ while True:
         rvecs, tvecs, _ = cv2.aruco.estimatePoseSingleMarkers(
             corners, 0.079, mtx, dist, np.float32(rvecs), np.float32(tvecs))
         for i in ids:
-            global mapToRobotMatrix
             i = np.where(ids == i)
             cv2.aruco.drawAxis(frame, mtx,
                                 dist, rvecs[i], tvecs[i], 0.035)
@@ -102,6 +103,7 @@ while True:
             mapToRobotMatrix = markerToField.getMarkerPose(ids[i][0], tvecs[0], rvecs)
             # Homogenous Matrix Transformation to get map in Relation to Odom matrix
             mapToOdomMatrix = mf.matrixInverseMultipy(mapToRobotMatrix,odomToRobotMatrix)
+            # print(mapToRobotMatrix)
     #robotPose = mf.matrixToPose(mapToRobotMatrix)
     robotPose = mf.matrixToPose(np.matmul(mapToOdomMatrix,odomToRobotMatrix))
     # Push to networktables
@@ -110,7 +112,7 @@ while True:
     table.putNumber("theta", robotPose[2])
     # print(str(robotPose))
 
-    # show the output frame
+    # # show the output frame
     # frame = cv2.flip(frame, 1)
     # cv2.imshow("Frame", frame)
     # key = cv2.waitKey(1) & 0xFF
