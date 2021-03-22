@@ -32,7 +32,7 @@ def getPose(pipe):
         y = data.rotation.y
         z = data.rotation.z
         w = data.rotation.w
-
+        print(f"xPos: {xPos}; yPos: {yPos}; zPos: {zPos}")
         # Quaternion to Euler Angle conversions (wikipedia)
         # Used for  yaw, but swapped axes so it is around the y axis
         angle = math.atan2(2 * ((w * y) + (z * x)), 1 - 2 * ((x * x) + (y * y)))  # angle in radians (pi to -pi)
