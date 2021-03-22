@@ -75,7 +75,6 @@ while True:
     # PoseExists returns true if there is a pose, otherwise don't compute during this cycle
     poseExists, RSmatrix = rsf.getPose(pipe)
     odomX, odomY, odomTheta = mf.matrixToPose(RSmatrix)
-    print(f"odomX: {odomX}; odomY: {odomY}, odomTheta: {odomTheta}")
     # If realsense isn't getting anything we're screwed basically
     if poseExists:
         # Construct matrix for the realsense in relation to the Odom DICT
