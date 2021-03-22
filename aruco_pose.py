@@ -50,6 +50,7 @@ args = vars(ap.parse_args())
 #Start realsense pipe
 pipe = rsf.init()
 
+# Use stored value for the calibration
 with open("calsLogitechCharuco2/calibration.pkl", 'rb') as f:
     mtx, dist, rvecs, tvecs = pickle.load(f)
 
